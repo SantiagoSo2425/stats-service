@@ -1,0 +1,27 @@
+﻿services:
+  dynamodb-local:
+    image: amazon/dynamodb-local
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  dynamodb-init:
+    image: amazon/aws-cli
+    container_name: dynamodb-init
+    depends_on:
+      - dynamodb-local
+    volumes:
+      - ./infrastructure/driven-adapters/dynamo-db/src/main/java/com/muebles/stats/dynamodb/config/init-dynamodb.sh:/init-dynamodb.sh
+    entrypoint: ["/bin/sh", "-c", "sleep 10 && sh /init-dynamodb.sh"]
+
+volumes:
+  dynamodb_data:
