@@ -107,11 +107,12 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: deployment
+          file: deployment/Dockerfile
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }}
           tags: santiagoso2425/stats-service:${{ env.VERSION }}
           build-args: |
-            JAR_FILE=applications/app-service/build/libs/*.jar
+            JAR_FILE=../applications/app-service/build/libs/*.jar
 
   release:
     if: github.event_name == 'release' 
