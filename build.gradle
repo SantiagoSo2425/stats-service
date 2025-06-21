@@ -30,8 +30,6 @@ sonar {
         property "sonar.java.coveragePlugin", "jacoco"
         property "sonar.scanner.force-deprecated-ce-task", "true"
         property "sonar.qualitygate.wait", "true"
-
-        // Deshabilitar el análisis automático en CI
         property "sonar.analysis.mode", "published"
         property "sonar.scanner.metadataFilePath", "none"
 
