@@ -38,17 +38,16 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Execute jacocoTestReport
-        run: ./gradlew test jacocoTestReport
-      - name: copy the reportTest to codeCoverage
-        run: cp build/reports/jacoco/report.xml jacoco.xml || echo "Code coverage failed"
-      - name: Build with Gradle
-        run: ./gradlew build --refresh-dependencies --no-daemon --continue
+      - name: Execute Gradle build and tests
+        run: ./gradlew build test jacocoTestReport --no-daemon --continue
+
+      # Análisis de SonarQube con la tarea 'sonar' en lugar de 'sonarqube'
       - name: SonarCloud Analysis
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.host.url=https://sonarcloud.io
+        # Usando la tarea 'sonar' en lugar de 'sonarqube' y configurando para no usar análisis automático
+        run: ./gradlew sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.qualitygate.wait=true
 
       # Publicar artefactos de construcción
       - name: Upload build artifacts
@@ -150,11 +149,3 @@ jobs:
           body: ${{steps.github_release.outputs.changelog}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Publicar documentación si existe
-      - name: Publish documentation
-        run: |
-          if [ -d "documentation" ]; then
-            echo "Publishing documentation..."
-            # Comando para publicar documentación (ej. GitHub Pages)
-          fi
