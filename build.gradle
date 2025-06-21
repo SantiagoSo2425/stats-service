@@ -30,8 +30,7 @@ sonar {
         property "sonar.java.coveragePlugin", "jacoco"
         property "sonar.scanner.force-deprecated-ce-task", "true"
         property "sonar.qualitygate.wait", "true"
-        property "sonar.analysis.mode", "published"
-        property "sonar.scanner.metadataFilePath", "none"
+        // property "sonar.scanner.metadataFilePath", "none" // Eliminada para evitar error de ruta absoluta
 
         // Configuración para SonarQube local (se puede sobreescribir desde línea de comandos)
         property "sonar.host.url", System.getProperty("sonar.host.url", "http://localhost:9000")
