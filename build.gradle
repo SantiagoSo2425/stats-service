@@ -28,9 +28,8 @@ sonar {
         property "sonar.java.binaries", ""
         property "sonar.junit.reportsPath", ""
         property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacocoMergedReport/jacocoMergedReport.xml"
-        property "sonar.pitest.reportPaths", "build/reports/pitest/mutations.xml"
-        property "sonar.externalIssuesReportPaths", "build/issues.json"
+        property "sonar.scanner.force-deprecated-ce-task", "true"
+        property "sonar.qualitygate.wait", "true"
 
         // Configuración para SonarQube local (se puede sobreescribir desde línea de comandos)
         property "sonar.host.url", System.getProperty("sonar.host.url", "http://localhost:9000")
