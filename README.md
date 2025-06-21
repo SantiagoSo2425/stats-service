@@ -180,15 +180,51 @@ Trabajar en Bancolombia representa una oportunidad excepcional por varias razone
 
 5. **Contribución al Código Abierto**: Herramientas como el Scaffold de Clean Architecture demuestran el compromiso de Bancolombia con el ecosistema de desarrollo y la comunidad open source.
 
-## 📋 Puntos Destacados de Calidad
+## 🧪 Calidad y Cobertura - Prueba Técnica
 
-El proyecto se construyó con un enfoque de calidad, como lo demuestran las métricas de SonarQube:
+Como parte de la prueba técnica, garantizo la calidad del código y la cobertura mínima del 70% utilizando SonarQube, que ya está incluido en el archivo `docker-compose.yml`.
 
-- **Cobertura de código**: 87.4% (superior al requisito del 70%)
-- **Bugs**: 0
-- **Vulnerabilidades**: 0
-- **Duplicación**: 0%
-- **Calificación A en Reliability, Security y Maintainability**
+Siga estos pasos para verificar los criterios de evaluación:
+
+1. **Levantar el entorno completo de la prueba técnica** (incluye DynamoDB, RabbitMQ y SonarQube):
+   
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Acceder a SonarQube**:
+   
+   Entrar a [http://localhost:9000](http://localhost:9000) con usuario y contraseña por defecto (`admin`/`admin`).
+
+3. **Generar  token personal de SonarQube**:
+   -  Click en  usuario (arriba a la derecha) > "My Account" > "Security".
+   - Crear un nuevo token y guardarlo (Se necesitará para el análisis).
+
+4. **Ejecutar las pruebas y generar el reporte de cobertura**:
+   
+   ```bash
+   ./gradlew test
+   ./gradlew jacocoTestReport
+   ```
+   El reporte de cobertura se genera en `build/reports/jacoco/test/html/index.html`.
+
+5. **Ejecutar el análisis de SonarQube**:
+   
+   ```bash
+   ./gradlew sonarqube -Dsonar.login=MI_TOKEN_GENERADO
+   ```
+   Reemplazo `MI_TOKEN_GENERADO` por el token  que generé.
+
+6. **Visualizar los resultados de calidad y cobertura**:
+   - Volver  ingresar a [http://localhost:9000](http://localhost:9000).
+   - Buscar el proyecto para ver los resultados.
+
+> **Puntos Destacados de Calidad**
+> - Cobertura de código: 87.4% (superior al requisito del 70%)
+> - Bugs: 0
+> - Vulnerabilidades: 0
+> - Duplicación: 0%
+> - Calificación A en Reliability, Security y Maintainability
 
 ## 📚 Referencias
 
@@ -202,4 +238,4 @@ El proyecto se construyó con un enfoque de calidad, como lo demuestran las mét
 
 ## 📄 Licencia
 
-Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.
+Distribuido bajo la Licencia MIT.
