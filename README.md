@@ -104,7 +104,7 @@ Esto iniciará:
 ### Paso 3: Compilar y Ejecutar la Aplicación
 
 ```bash
-./gradlew bootRun
+gradle clean build
 ```
 
 La aplicación estará disponible en `http://localhost:8080`
@@ -122,7 +122,7 @@ http://localhost:8080/swagger-ui.html
 ### Ejecutar Pruebas Unitarias
 
 ```bash
-./gradlew test
+gradle test
 ```
 
 ### Generar Reporte de Cobertura
