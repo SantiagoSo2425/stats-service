@@ -1,2 +1,2 @@
-﻿infrastructure/driven-adapters/dynamo-db/src/main/java/com/muebles/stats/dynamodb/config/init-dynamodb.sh text eol=cr
+﻿infrastructure/driven-adapters/dynamo-db/src/main/java/com/muebles/stats/dynamodb/config/init-dynamodb.sh text eol=lf
 
