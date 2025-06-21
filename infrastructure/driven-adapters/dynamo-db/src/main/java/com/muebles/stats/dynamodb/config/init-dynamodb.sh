@@ -5,8 +5,8 @@ export AWS_SECRET_ACCESS_KEY="dummy"
 
 TABLE_NAME="StatsTable"
 
-# Creación de la tabla con un solo comando de una línea
-aws dynamodb create-table --table-name $TABLE_NAME \
+aws dynamodb create-table \
+  --table-name $TABLE_NAME \
   --attribute-definitions \
     AttributeName=timestamp,AttributeType=S \
     AttributeName=hash,AttributeType=S \
