@@ -2,6 +2,16 @@
 
 ![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
 
+## ⚠️ Importante para usuarios de Windows
+
+Antes de clonar el repositorio, ejecute el siguiente comando para evitar problemas con los finales de línea en scripts de shell:
+
+```bash
+git config --global core.autocrlf false
+```
+
+Este paso es crítico para que los scripts de inicialización de DynamoDB funcionen correctamente en Docker.
+
 ## 📋 Descripción del Proyecto
 
 Este microservicio forma parte de la nueva arquitectura de Muebles SAS orientada a mejorar la calidad del servicio al cliente. Se encarga de recibir, validar y procesar estadísticas de interacción con usuarios de forma reactiva, utilizando tecnologías modernas como Spring WebFlux, DynamoDB y RabbitMQ.
@@ -128,7 +138,7 @@ gradle test
 ### Generar Reporte de Cobertura
 
 ```bash
-./gradlew jacocoTestReport
+gradle jacocoTestReport
 ```
 
 El reporte estará disponible en `build/reports/jacoco/test/html/index.html`
@@ -203,15 +213,15 @@ Siga estos pasos para verificar los criterios de evaluación:
 4. **Ejecutar las pruebas y generar el reporte de cobertura**:
    
    ```bash
-   ./gradlew test
-   ./gradlew jacocoTestReport
+   gradle test
+   gradle jacocoTestReport
    ```
    El reporte de cobertura se genera en `build/reports/jacoco/test/html/index.html`.
 
 5. **Ejecutar el análisis de SonarQube**:
    
-   ```bash
-   ./gradlew sonarqube -Dsonar.login=MI_TOKEN_GENERADO
+   ```powershell
+   gradle sonarqube "-Dsonar.login=MI_TOKEN_GENERADO"
    ```
    Reemplazo `MI_TOKEN_GENERADO` por el token  que generé.
 
@@ -220,7 +230,7 @@ Siga estos pasos para verificar los criterios de evaluación:
    - Buscar el proyecto para ver los resultados.
 
 > **Puntos Destacados de Calidad**
-> - Cobertura de código: 87.4% (superior al requisito del 70%)
+> - Cobertura de código: 87% (superior al requisito del 70%)
 > - Bugs: 0
 > - Vulnerabilidades: 0
 > - Duplicación: 0%
