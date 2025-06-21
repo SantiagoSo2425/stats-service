@@ -41,13 +41,17 @@ jobs:
       - name: Execute Gradle build and tests
         run: ./gradlew build test jacocoTestReport --no-daemon --continue
 
-      # Análisis de SonarQube con la tarea 'sonar' en lugar de 'sonarqube'
+      # Aseguramos que el informe de jacoco esté disponible para SonarCloud
+      - name: Generate jacoco merged report
+        run: ./gradlew jacocoMergedReport || echo "jacocoMergedReport task not found"
+
+      # Análisis de SonarQube con la tarea 'sonar' y modo detallado
       - name: SonarCloud Analysis
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        # Usando la tarea 'sonar' en lugar de 'sonarqube' y configurando para no usar análisis automático
-        run: ./gradlew sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.qualitygate.wait=true
+        # Usando la tarea 'sonar' en lugar de 'sonarqube' y añadiendo información detallada para depuración
+        run: ./gradlew sonar --info -Dsonar.verbose=true -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.qualitygate.wait=true
 
       # Publicar artefactos de construcción
       - name: Upload build artifacts
