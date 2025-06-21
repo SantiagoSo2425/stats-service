@@ -52,6 +52,46 @@ El microservicio expone un endpoint HTTP POST `/stats` que:
 > 
 > Ejemplo: `250,25,10,100,100,7,8` → MD5 → `5484062a4be1ce5645eb414663e14f59`
 
+## 🔄 Flujo de Datos y Arquitectura
+
+
+
+El servicio implementa el siguiente flujo de procesamiento:
+
+1. **Recepción de Datos**: El controlador REST recibe las estadísticas mediante el endpoint POST `/stats`.
+2. **Validación**: El servicio valida la integridad de los datos mediante el hash MD5:
+   - Concatena los valores numéricos en orden específico
+   - Genera el hash MD5 utilizando `commons-codec:commons-codec`
+   - Compara con el hash recibido en el payload
+3. **Persistencia**: Si la validación es exitosa, los datos se almacenan en DynamoDB
+4. **Publicación**: Se publica un evento en RabbitMQ para notificar a otros servicios
+5. **Respuesta**: Se retorna un código HTTP apropiado (200 OK o 400 Bad Request)
+
+### Implementación de la Validación del Hash MD5
+
+```java
+public boolean isValidHash(Stats stats) {
+    String concatenatedValues = stats.getTotalContactoClientes() + "," +
+                               stats.getMotivoReclamo() + "," +
+                               stats.getMotivoGarantia() + "," +
+                               stats.getMotivoDuda() + "," +
+                               stats.getMotivoCompra() + "," +
+                               stats.getMotivoFelicitaciones() + "," +
+                               stats.getMotivoCambio();
+    
+    String calculatedHash = DigestUtils.md5Hex(concatenatedValues);
+    return calculatedHash.equals(stats.getHash());
+}
+```
+
+### Manejo de Errores
+
+El servicio implementa un manejo de errores reactivo:
+
+- **HashInvalidException**: Error personalizado para validación fallida de hash
+- **Handler Global**: Captura excepciones y las transforma en respuestas HTTP adecuadas
+- **Logs Estructurados**: Registro detallado para facilitar diagnóstico y monitoreo
+
 ## 🛠️ Tecnologías Utilizadas
 
 - **Java 17+**: Para desarrollo backend moderno
@@ -163,6 +203,131 @@ curl -X POST http://localhost:8080/stats \
 ```
 
 O utilizando la interfaz Swagger en `http://localhost:8080/swagger-ui.html`
+
+### Ejemplos de Pruebas Implementadas
+
+El proyecto incluye pruebas unitarias y de integración para garantizar la calidad del código:
+
+#### Prueba Unitaria para Validación de Hash
+
+```java
+@Test
+void shouldValidateCorrectHash() {
+    // Given
+    Stats stats = Stats.builder()
+        .totalContactoClientes(250)
+        .motivoReclamo(25)
+        .motivoGarantia(10)
+        .motivoDuda(100)
+        .motivoCompra(100)
+        .motivoFelicitaciones(7)
+        .motivoCambio(8)
+        .hash("5484062a4be1ce5645eb414663e14f59")
+        .build();
+    
+    // When
+    boolean isValid = statsValidator.isValidHash(stats);
+    
+    // Then
+    assertTrue(isValid);
+}
+
+@Test
+void shouldRejectInvalidHash() {
+    // Given
+    Stats stats = Stats.builder()
+        .totalContactoClientes(250)
+        .motivoReclamo(25)
+        .motivoGarantia(10)
+        .motivoDuda(100)
+        .motivoCompra(100)
+        .motivoFelicitaciones(7)
+        .motivoCambio(8)
+        .hash("invalid_hash_value")
+        .build();
+    
+    // When
+    boolean isValid = statsValidator.isValidHash(stats);
+    
+    // Then
+    assertFalse(isValid);
+}
+```
+
+#### Prueba de Integración con WebTestClient
+
+```java
+@Test
+void shouldSaveValidStats() {
+    // Given
+    Stats validStats = createValidStats();
+    
+    // When/Then
+    webTestClient.post()
+        .uri("/stats")
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(validStats))
+        .exchange()
+        .expectStatus().isOk();
+        
+    // Verify data was saved in DynamoDB
+    StepVerifier.create(repository.findByTimestamp(validStats.getTimestamp()))
+        .expectNextMatches(saved -> saved.getHash().equals(validStats.getHash()))
+        .verifyComplete();
+}
+
+@Test
+void shouldRejectInvalidStats() {
+    // Given
+    Stats invalidStats = createInvalidStats();
+    
+    // When/Then
+    webTestClient.post()
+        .uri("/stats")
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(invalidStats))
+        .exchange()
+        .expectStatus().isBadRequest();
+}
+```
+
+## ⚡ Escalabilidad y Rendimiento
+
+El servicio ha sido diseñado con consideraciones de escalabilidad y rendimiento:
+
+1. **Programación Reactiva**: Utilizando Spring WebFlux para manejar alta concurrencia con recursos mínimos
+2. **Configuración de Backpressure**: Implementación de estrategias para manejar sobrecarga
+3. **Timeouts Configurables**: Para evitar bloqueos y fallos en cascada
+4. **Idempotencia**: Las operaciones pueden ser repetidas sin efectos secundarios
+5. **Auto-escalado**: Compatible con configuraciones de Kubernetes para escalado horizontal
+
+### Configuración de Limitación de Carga
+
+```yaml
+# Ejemplo de configuración para limitación de carga
+spring:
+  webflux:
+    base-path: /api
+  codec:
+    max-in-memory-size: 2MB  # Límite de tamaño de payload
+  
+app:
+  rate-limiter:
+    enabled: true
+    limit-for-period: 100    # Solicitudes por período
+    limit-refresh-period: 1m # Período de refresco
+    timeout-duration: 5s     # Timeout para solicitudes
+```
+
+## 🔒 Seguridad
+
+El servicio implementa las siguientes medidas de seguridad:
+
+1. **Validación de Entrada**: Sanitización completa de todos los datos entrantes
+2. **Rate Limiting**: Protección contra ataques de denegación de servicio
+3. **Principio de Mínimo Privilegio**: Acceso restringido a recursos externos
+4. **Logs de Seguridad**: Registro de eventos sospechosos o errores
+5. **Configuración Segura**: Sin credenciales en código o archivos de configuración
 
 ## 📊 Monitoreo y Métricas
 
