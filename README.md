@@ -148,7 +148,7 @@ curl -X POST http://localhost:8080/stats \
     "motivoCompra": 100,
     "motivoFelicitaciones": 7,
     "motivoCambio": 8,
-    "hash": "02946f262f2eb0d8d5c8e76c50433ed8"
+    "hash": "5484062a4be1ce5645eb414663e14f59"
   }'
 ```
 
