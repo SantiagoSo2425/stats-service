@@ -51,16 +51,16 @@ public class ProcessStatsUseCase {
             String calculatedHash = calculateMD5(data);
 
             // Logs de depuración
-            log.info("Datos para hash: '" + data + "'");
-            log.info("Hash calculado: " + calculatedHash);
-            log.info("Hash recibido: " + stats.getHash());
+           // log.info("Datos para hash: '" + data + "'");
+            //log.info("Hash calculado: " + calculatedHash);
+            //log.info("Hash recibido: " + stats.getHash());
 
             if (!calculatedHash.equalsIgnoreCase(stats.getHash())) {
                 log.log(Level.SEVERE, "Hash inválido. Calculado: {0}, Recibido: {1}", new Object[]{calculatedHash, stats.getHash()});
                 throw new InvalidHashException("El hash proporcionado no es válido.");
             }
 
-            log.info("Hash validado correctamente");
+           // log.info("Hash validado correctamente");
 
             // Asignar timestamp aquí para asegurar que tenga valor
             String timestamp = Instant.now().toString();

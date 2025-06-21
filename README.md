@@ -27,20 +27,20 @@ El microservicio expone un endpoint HTTP POST `/stats` que:
 
 ```json
 {
-  "totalContactoClientes": 250,
-  "motivoReclamo": 25,
-  "motivoGarantia": 10,
-  "motivoDuda": 100,
-  "motivoCompra": 100,
-  "motivoFelicitaciones": 7,
-  "motivoCambio": 8,
-  "hash": "02946f262f2eb0d8d5c8e76c50433ed8"
+   "totalContactoClientes": 250,
+   "motivoReclamo": 25,
+   "motivoGarantia": 10,
+   "motivoDuda": 100,
+   "motivoCompra": 100,
+   "motivoFelicitaciones": 7,
+   "motivoCambio": 8,
+   "hash": "5484062a4be1ce5645eb414663e14f59"
 }
 ```
 
 > El hash MD5 se calcula concatenando los valores en el orden: `totalContactoClientes,motivoReclamo,motivoGarantia,motivoDuda,motivoCompra,motivoFelicitaciones,motivoCambio`
 > 
-> Ejemplo: `250,25,10,100,100,7,8` → MD5 → `02946f262f2eb0d8d5c8e76c50433ed8`
+> Ejemplo: `250,25,10,100,100,7,8` → MD5 → `5484062a4be1ce5645eb414663e14f59`
 
 ## 🛠️ Tecnologías Utilizadas
 
