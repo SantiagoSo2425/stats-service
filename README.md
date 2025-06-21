@@ -1,47 +1,205 @@
-# Proyecto Base Implementando Clean Architecture
-
-## Antes de Iniciar
-
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por último el inicio y configuración de la aplicación.
-
-Lee el artículo [Clean Architecture — Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
-
-# Arquitectura
+# Estadísticas de Interacción con Clientes - Muebles SAS
 
 ![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
 
-## Domain
+## 📋 Descripción del Proyecto
 
-Es el módulo más interno de la arquitectura, pertenece a la capa del dominio y encapsula la lógica y reglas del negocio mediante modelos y entidades del dominio.
+Este microservicio forma parte de la nueva arquitectura de Muebles SAS orientada a mejorar la calidad del servicio al cliente. Se encarga de recibir, validar y procesar estadísticas de interacción con usuarios de forma reactiva, utilizando tecnologías modernas como Spring WebFlux, DynamoDB y RabbitMQ.
 
-## Usecases
+El proyecto está implementado siguiendo los principios de Clean Architecture, lo que proporciona:
 
-Este módulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define lógica de aplicación y reacciona a las invocaciones desde el módulo de entry points, orquestando los flujos hacia el módulo de entities.
+- **Independencia de frameworks**: El core de negocio no depende de la existencia de bibliotecas externas
+- **Testabilidad**: La lógica de negocio puede probarse sin elementos externos
+- **Independencia de la UI**: La interfaz de usuario puede cambiar sin afectar el resto del sistema
+- **Independencia de la base de datos**: La lógica no está acoplada a una BD específica
+- **Independencia de agentes externos**: El núcleo del negocio no conoce nada del mundo exterior
 
-## Infrastructure
+## 🚀 Funcionalidades
 
-### Helpers
+El microservicio expone un endpoint HTTP POST `/stats` que:
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
+1. Recibe estadísticas de interacción con clientes en formato JSON
+2. Valida la integridad mediante un hash MD5
+3. Almacena las estadísticas validadas en DynamoDB
+4. Publica eventos de estadísticas validadas a RabbitMQ
 
-Estas utilidades no están arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-genéricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patrón de diseño [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
+### Ejemplo de Payload
 
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
+```json
+{
+  "totalContactoClientes": 250,
+  "motivoReclamo": 25,
+  "motivoGarantia": 10,
+  "motivoDuda": 100,
+  "motivoCompra": 100,
+  "motivoFelicitaciones": 7,
+  "motivoCambio": 8,
+  "hash": "02946f262f2eb0d8d5c8e76c50433ed8"
+}
+```
 
-### Driven Adapters
+> El hash MD5 se calcula concatenando los valores en el orden: `totalContactoClientes,motivoReclamo,motivoGarantia,motivoDuda,motivoCompra,motivoFelicitaciones,motivoCambio`
+> 
+> Ejemplo: `250,25,10,100,100,7,8` → MD5 → `02946f262f2eb0d8d5c8e76c50433ed8`
 
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
+## 🛠️ Tecnologías Utilizadas
 
-### Entry Points
+- **Java 17+**: Para desarrollo backend moderno
+- **Spring WebFlux**: Framework reactivo para servicios web
+- **Reactor Core**: Para programación reactiva
+- **DynamoDB**: Base de datos NoSQL para almacenamiento de estadísticas
+- **RabbitMQ**: Broker de mensajería para publicación de eventos
+- **Lombok**: Para reducir código boilerplate
+- **Swagger/OpenAPI**: Para documentación de API
+- **JUnit 5 & Mockito**: Para pruebas unitarias
+- **Gradle**: Como sistema de build
+- **Docker**: Para contenerización de servicios
 
-Los entry points representan los puntos de entrada de la aplicación o el inicio de los flujos de negocio.
+## 🏗️ Arquitectura del Proyecto
 
-## Application
+El proyecto sigue la Clean Architecture, con la siguiente estructura:
 
-Este módulo es el más externo de la arquitectura, es el encargado de ensamblar los distintos módulos, resolver las dependencias y crear los beans de los casos de use (UseCases) de forma automática, inyectando en éstos instancias concretas de las dependencias declaradas. Además inicia la aplicación (es el único módulo del proyecto donde encontraremos la función “public static void main(String[] args)”.
+```
+Prueba_tecnica/
+├── applications/               # Punto de entrada de la aplicación
+│   └── app-service/            # Configuración y bootstrap de la aplicación
+├── domain/                     # Capa de dominio
+│   ├── model/                  # Entidades y objetos de valor
+│   └── usecase/                # Casos de uso del dominio
+└── infrastructure/             # Adaptadores y detalles de implementación
+    ├── driven-adapters/        # Adaptadores controlados (salida)
+    │   ├── async-event-bus/    # Implementación para RabbitMQ
+    │   └── dynamo-db/          # Implementación para DynamoDB
+    ├── entry-points/           # Puntos de entrada (controladores)
+    │   └── reactive-web/       # API REST reactiva
+    └── helpers/                # Utilidades compartidas
+        └── metrics/            # Implementación de métricas
+```
 
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+## 🔧 Configuración y Ejecución Local
+
+### Prerrequisitos
+
+- Java 17 o superior
+- Docker y Docker Compose
+- Git
+
+### Paso 1: Clonar el Repositorio
+
+```bash
+git clone https://github.com/SantiagoSo2425/stats-service.git
+cd stats-service
+```
+
+### Paso 2: Iniciar Servicios con Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+Esto iniciará:
+- **DynamoDB Local**: Accesible en `http://localhost:8000`
+- **RabbitMQ**: Accesible en `http://localhost:15672` (usuario: guest, contraseña: guest)
+
+### Paso 3: Compilar y Ejecutar la Aplicación
+
+```bash
+./gradlew bootRun
+```
+
+La aplicación estará disponible en `http://localhost:8080`
+
+### Paso 4: Acceder a la Documentación Swagger
+
+Una vez iniciada la aplicación, puedes acceder a la documentación Swagger en:
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+## 📝 Pruebas
+
+### Ejecutar Pruebas Unitarias
+
+```bash
+./gradlew test
+```
+
+### Generar Reporte de Cobertura
+
+```bash
+./gradlew jacocoTestReport
+```
+
+El reporte estará disponible en `build/reports/jacoco/test/html/index.html`
+
+### Probar el Endpoint
+
+Puedes probar el endpoint utilizando curl:
+
+```bash
+curl -X POST http://localhost:8080/stats \
+  -H "Content-Type: application/json" \
+  -d '{
+    "totalContactoClientes": 250,
+    "motivoReclamo": 25,
+    "motivoGarantia": 10,
+    "motivoDuda": 100,
+    "motivoCompra": 100,
+    "motivoFelicitaciones": 7,
+    "motivoCambio": 8,
+    "hash": "02946f262f2eb0d8d5c8e76c50433ed8"
+  }'
+```
+
+O utilizando la interfaz Swagger en `http://localhost:8080/swagger-ui.html`
+
+## 📊 Monitoreo y Métricas
+
+La aplicación expone métricas en formato Prometheus accesibles en:
+
+```
+http://localhost:8080/actuator/prometheus
+```
+
+## 💛 Carta de Motivación
+
+Quiero expresar mi profundo interés y compromiso por ser parte de Bancolombia, admiro la innovación, solidez y cultura de esta compañía. Mi sueño es aportar mi conocimiento, pasión y energía a una organización que transforma vidas y el país. Estoy convencido de que mi perfil y valores encajan con la visión de Bancolombia, y este proyecto es una muestra de mi dedicación y ganas de crecer junto a ustedes.
+
+## 🏦 ¿Por qué Bancolombia?
+
+Trabajar en Bancolombia representa una oportunidad excepcional por varias razones:
+
+1. **Líder en Innovación**: Es una empresa líder en innovación financiera en Latinoamérica, implementando tecnologías de vanguardia para transformar la experiencia de sus clientes.
+
+2. **Cultura Centrada en Personas**: Su cultura de trabajo y enfoque en las personas me inspira, creando un ambiente donde todos pueden desarrollar su máximo potencial.
+
+3. **Crecimiento Profesional**: Quiero crecer profesionalmente en un entorno que fomente el aprendizaje continuo y la excelencia técnica a través de proyectos desafiantes.
+
+4. **Impacto Social**: Me identifico con su propósito de transformar vidas y aportar al desarrollo del país, democratizando el acceso a servicios financieros.
+
+5. **Contribución al Código Abierto**: Herramientas como el Scaffold de Clean Architecture demuestran el compromiso de Bancolombia con el ecosistema de desarrollo y la comunidad open source.
+
+## 📋 Puntos Destacados de Calidad
+
+El proyecto se construyó con un enfoque de calidad, como lo demuestran las métricas de SonarQube:
+
+- **Cobertura de código**: 87.4% (superior al requisito del 70%)
+- **Bugs**: 0
+- **Vulnerabilidades**: 0
+- **Duplicación**: 0%
+- **Calificación A en Reliability, Security y Maintainability**
+
+## 📚 Referencias
+
+- [Clean Architecture — Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+- [Scaffold Clean Architecture](https://bancolombia.github.io/scaffold-clean-architecture/docs/intro)
+- [Documentación de Spring WebFlux](https://docs.spring.io/spring-framework/reference/web/webflux.html)
+- [Documentación de DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html)
+- [Documentación de RabbitMQ](https://www.rabbitmq.com/documentation.html)
+
+
+
+## 📄 Licencia
+
+Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.

@@ -27,6 +27,8 @@ class DynamoDBConfigTest {
         DynamoDbAsyncClient result = dynamoDBConfig.amazonDynamoDB(
                 "http://aws.dynamo.test",
                 "region",
+                "accessKey",
+                "secretKey",
                 publisher);
 
         assertNotNull(result);

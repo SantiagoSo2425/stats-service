@@ -2,6 +2,11 @@ package com.muebles.stats.api;
 
 import com.muebles.stats.model.stats.Stats;
 import com.muebles.stats.usecase.processstats.ProcessStatsUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -13,21 +18,27 @@ import reactor.core.publisher.Mono;
 public class Handler {
     private final ProcessStatsUseCase processStatsUseCase;
 
-    public Mono<ServerResponse> listenGETUseCase(ServerRequest serverRequest) {
-        // useCase.logic();
-        return ServerResponse.ok().bodyValue("");
-    }
-
-    public Mono<ServerResponse> listenGETOtherUseCase(ServerRequest serverRequest) {
-        // useCase2.logic();
-        return ServerResponse.ok().bodyValue("");
-    }
-
-    public Mono<ServerResponse> listenPOSTUseCase(ServerRequest serverRequest) {
-        // useCase.logic();
-        return ServerResponse.ok().bodyValue("");
-    }
-
+    @Operation(
+        summary = "Procesar estadísticas",
+        description = "Endpoint para enviar y procesar estadísticas de muebles",
+        requestBody = @RequestBody(
+            required = true,
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Stats.class)
+            )
+        ),
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Estadísticas procesadas correctamente"
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "Solicitud inválida"
+            )
+        }
+    )
     public Mono<ServerResponse> listenPOSTStats(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(Stats.class)
                 .flatMap(processStatsUseCase::execute)
