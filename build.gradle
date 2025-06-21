@@ -31,6 +31,10 @@ sonar {
         property "sonar.scanner.force-deprecated-ce-task", "true"
         property "sonar.qualitygate.wait", "true"
 
+        // Deshabilitar el análisis automático en CI
+        property "sonar.analysis.mode", "published"
+        property "sonar.scanner.metadataFilePath", "none"
+
         // Configuración para SonarQube local (se puede sobreescribir desde línea de comandos)
         property "sonar.host.url", System.getProperty("sonar.host.url", "http://localhost:9000")
 

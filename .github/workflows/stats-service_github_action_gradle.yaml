@@ -51,7 +51,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         # Usando la tarea 'sonar' en lugar de 'sonarqube' y añadiendo información detallada para depuración
-        run: ./gradlew sonar --info -Dsonar.verbose=true -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.qualitygate.wait=true
+        run: ./gradlew sonar --info -Dsonar.verbose=true -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.qualitygate.wait=true -Dsonar.alm.enabled=false -Dsonar.analysis.mode=publish -Dsonar.scanner.metadataFilePath=none -Dsonar.scanner.force-deprecated-ce-task=true
 
       # Publicar artefactos de construcción
       - name: Upload build artifacts
