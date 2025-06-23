@@ -133,7 +133,15 @@ Prueba_tecnica/
 - Java 17 o superior
 - Docker y Docker Compose
 - Git
+## ⚠️ Importante para usuarios de Windows
 
+Antes de clonar el repositorio, ejecute el siguiente comando para evitar problemas con los finales de línea en scripts de shell:
+
+```bash
+git config --global core.autocrlf false
+```
+
+Este paso es crítico para que los scripts de inicialización de DynamoDB funcionen correctamente en Docker.
 ### Paso 1: Clonar el Repositorio
 
 ```bash
