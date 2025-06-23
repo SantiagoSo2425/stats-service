@@ -143,23 +143,40 @@ cd stats-service
 
 ### Paso 2: Iniciar Servicios con Docker Compose
 
+## ⚠️ Consideraciones para Docker
+
+Este proyecto está configurado para funcionar correctamente en entornos Docker con los siguientes ajustes:
+
+1. **Variables de entorno para conexiones entre servicios:**
+   - `SPRING_RABBITMQ_HOST=rabbitmq` para conectar con RabbitMQ
+   - `DYNAMODB_ENDPOINT=http://dynamodb-local:8000` para conectar con DynamoDB
+
+2. **Healthchecks para orden de inicio:**
+   - RabbitMQ cuenta con un healthcheck que garantiza que está disponible antes de iniciar la aplicación
+   - Especificado en el docker-compose.yml con la versión 2.4
+
+3. **Conexión entre contenedores:**
+   - Se utilizan los nombres de servicio del docker-compose como hosts en vez de localhost
+   - Esto permite que los servicios se comuniquen correctamente dentro de la red Docker
+
+Para ejecutar correctamente los servicios y evitar problemas de conexión:
+
 ```bash
+docker-compose down
+docker-compose build --no-cache stats-service
 docker-compose up -d
 ```
+
 
 Esto iniciará:
 - **DynamoDB Local**: Accesible en `http://localhost:8000`
 - **RabbitMQ**: Accesible en `http://localhost:15672` (usuario: guest, contraseña: guest)
 
-### Paso 3: Compilar y Ejecutar la Aplicación
 
-```bash
-gradle clean build
-```
 
 La aplicación estará disponible en `http://localhost:8080`
 
-### Paso 4: Acceder a la Documentación Swagger
+### Paso 3: Acceder a la Documentación Swagger
 
 Una vez iniciada la aplicación, puedes acceder a la documentación Swagger en:
 
@@ -414,3 +431,4 @@ Siga estos pasos para verificar los criterios de evaluación:
 ## 📄 Licencia
 
 Distribuido bajo la Licencia MIT.
+

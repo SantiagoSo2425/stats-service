@@ -1,0 +1,16 @@
+﻿build/
+build-cache/
+.gradle/
+.git/
+**/build/
+**/.classpath
+**/.project
+**/.settings
+*.iml
+*.log
+*.tmp
+*.swp
+.DS_Store
+.idea/
+.vscode/
+

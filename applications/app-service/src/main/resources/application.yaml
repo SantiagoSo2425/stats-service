@@ -13,12 +13,17 @@ spring:
     console:
       enabled: true
       path: "/h2"
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:rabbitmq}
+    port: 5672
+    username: guest
+    password: guest
 aws:
   accessKey: dummy
   secretKey: dummy
   region: us-west-2
   dynamodb:
-    endpoint: "http://localhost:8000"
+    endpoint: ${DYNAMODB_ENDPOINT:http://dynamodb-local:8000}
 management:
   endpoints:
     web:
