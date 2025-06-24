@@ -177,7 +177,7 @@ docker-compose up -d
 Esto iniciará:
 - **DynamoDB Local**: Accesible en `http://localhost:8000`
 - **RabbitMQ**: Accesible en `http://localhost:15672` (usuario: guest, contraseña: guest)
-
+- **SonarQube**: Accesible en `http://localhost:9000` (usuario: admin, contraseña: admin)
 
 
 La aplicación estará disponible en `http://localhost:8080`
