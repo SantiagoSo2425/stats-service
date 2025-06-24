@@ -161,7 +161,6 @@ Este proyecto está configurado para funcionar correctamente en entornos Docker 
 
 2. **Healthchecks para orden de inicio:**
    - RabbitMQ cuenta con un healthcheck que garantiza que está disponible antes de iniciar la aplicación
-   - Especificado en el docker-compose.yml con la versión 2.4
 
 3. **Conexión entre contenedores:**
    - Se utilizan los nombres de servicio del docker-compose como hosts en vez de localhost
@@ -170,7 +169,6 @@ Este proyecto está configurado para funcionar correctamente en entornos Docker 
 Para ejecutar correctamente los servicios y evitar problemas de conexión:
 
 ```bash
-docker-compose down
 docker-compose build --no-cache stats-service
 docker-compose up -d
 ```
